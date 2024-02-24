@@ -4,10 +4,10 @@ import cv2
 import multiprocessing as mp
 import numpy as np
 
-# Crear una barrera para dos hilos
+# Create a barrier for two threads
 barrier = threading.Barrier(1)
 
-# Variables equivalentes
+# Equivalent variables
 cols, rows = 2, 2
 w, h = 400 // cols, 400 // rows
 tiles = []
@@ -18,7 +18,7 @@ class Tile:
         self.index = index
         self.img = img
 
-# Configuración inicial
+# Initial setup
 def setup():
     global tiles, board, solved_board
     for i in range(cols):
@@ -32,11 +32,11 @@ def setup():
     tiles.pop()
     board.pop()
     board.append(-1)
-    # Guarda una copia del tablero resuelto
+    # Save a copy of the solved board
     solved_board = board.copy()
     simple_shuffle(board)
 
-# Actualizar los mosaicos
+# Update the tiles
 def update_tiles(cap):
     global tiles
     for i in range(cols):
@@ -48,7 +48,7 @@ def update_tiles(cap):
                 if ret:
                     tiles[index].img = cv2.resize(frame[y:y+h, x:x+w], (w, h))
 
-# Funciones auxiliares
+# Helper functions
 def swap(i, j, arr):
     arr[i], arr[j] = arr[j], arr[i]
 
@@ -77,7 +77,7 @@ def move(i, j, arr):
 def is_solved():
     return board == solved_board
 
-# Manejador de eventos de ratón
+# Mouse event handler
 def click_event(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         i = x // w
@@ -104,10 +104,10 @@ def process_frame_concurrent(q_in, q_out, cap):
         frame = final_img
         if is_solved():
             if not puzzle_completed:
-                cv2.putText(final_img, 'Completado!!!', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-                cv2.imshow("Rompecabezas", final_img)
-                cv2.waitKey(5000)  # Muestra el mensaje durante 2 segundos
-                cv2.destroyWindow("Rompecabezas")  # Cierra la ventana
+                cv2.putText(final_img, 'Completed!!!', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                cv2.imshow("Puzzle", final_img)
+                cv2.waitKey(5000)  # Show the message for 2 seconds
+                cv2.destroyWindow("Puzzle")  # Close the window
                 puzzle_completed = True
         else:
             puzzle_completed = False
