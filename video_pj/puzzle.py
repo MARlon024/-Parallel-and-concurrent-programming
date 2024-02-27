@@ -1,7 +1,6 @@
 import random
 import threading
 import cv2
-import multiprocessing as mp
 import numpy as np
 
 # Create a barrier for two threads

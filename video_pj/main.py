@@ -7,7 +7,14 @@ import threading
 import queue
 from puzzle import click_event,process_frame_concurrent
 from fractal import process_frame_parallel,process_frame_smile
+import signal
+import sys
 
+# Define global variables
+start_time_total = None
+total_parallel_time = None
+total_smile_time = None
+total_concurrent_time = None
 
 def show_frame(q, window_name):
     cv2.namedWindow(window_name)
@@ -22,8 +29,46 @@ def show_frame(q, window_name):
             break
 
 
+def signal_handler(sig, frame):
+    # Calculate total execution time
+    total_execution_time = time.time() - start_time_total
+
+    # Calculate individual speedup
+    parallel_speedup = total_execution_time / total_parallel_time
+    smile_speedup = total_execution_time / total_smile_time
+    concurrent_speedup = total_execution_time / total_concurrent_time
+
+    # Calculate overall speedup (assuming baseline_time is provided)
+    overall_speedup = total_concurrent_time / total_execution_time
+
+    # Calculate efficiency
+    parallel_efficiency = parallel_speedup 
+    smile_efficiency = smile_speedup
+    concurrent_efficiency = concurrent_speedup
+
+    # Write the metrics to a file
+    with open('metrics.txt', 'w') as f:
+        f.write("Processing Times:\n")
+        f.write(f"  Parallel: {total_parallel_time:.2f} seconds\n")
+        f.write(f"  Smile: {total_smile_time:.2f} seconds\n")
+        f.write(f"  Concurrent: {total_concurrent_time:.2f} seconds\n")
+        f.write("Speedups:\n")
+        f.write(f"  Parallel: {parallel_speedup:.2f}\n")
+        f.write(f"  Smile: {smile_speedup:.2f}\n")
+        f.write(f"  Concurrent: {concurrent_speedup:.2f}\n")
+        f.write(f"Overall Speedup: {overall_speedup:.2f}\n")
+        f.write("Efficiencies:\n")
+        f.write(f"  Parallel: {parallel_efficiency:.2f}\n")
+        f.write(f"  Smile: {smile_efficiency:.2f}\n")
+        f.write(f"  Concurrent: {concurrent_efficiency:.2f}\n")
+
+    sys.exit(0)
+
+# Set the signal handler
+signal.signal(signal.SIGINT, signal_handler)
 
 def main():
+    global start_time_total, total_parallel_time, total_smile_time, total_concurrent_time
     cap = cv2.VideoCapture(0)
 
     # Create queues to share frames between processes/threads
@@ -57,12 +102,13 @@ def main():
     t_concurrent_show.start() 
     # Check if the file exists
     file_csv='times.csv'
+    # Capture total execution time
+    start_time_total = time.time()
     if os.path.exists(file_csv):
         # If it exists, we delete it to create a new one
         os.remove(file_csv)
     with open(file_csv, 'w', newline='') as file:
         writer = csv.writer(file)
-
         while True:
             ret, frame = cap.read()
             if not ret:
@@ -79,7 +125,8 @@ def main():
 
             # Write the times in the CSV file
             writer.writerow([total_parallel_time, total_smile_time, total_concurrent_time])
-
+    
+   
     q_parallel_in.put(None)
     q_smile_in.put(None)  
     q_concurrent_in.put(None)

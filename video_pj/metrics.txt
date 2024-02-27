@@ -1,0 +1,13 @@
+Processing Times:
+  Parallel: 4.97 seconds
+  Smile: 4.97 seconds
+  Concurrent: 4.96 seconds
+Speedups:
+  Parallel: 1.01
+  Smile: 1.02
+  Concurrent: 1.02
+Overall Speedup: 0.98
+Efficiencies:
+  Parallel: 1.01
+  Smile: 1.02
+  Concurrent: 1.02

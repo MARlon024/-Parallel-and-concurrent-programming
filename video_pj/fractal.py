@@ -1,6 +1,5 @@
 import threading
 import cv2
-import multiprocessing as mp
 import numpy as np
 
 barrier = threading.Barrier(2)
